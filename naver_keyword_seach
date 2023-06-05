@@ -1,0 +1,113 @@
+#Step 1. 필요한 모듈과 라이브러리를 import 합니다
+
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import time
+import sys
+
+import math
+import numpy  
+import pandas as pd  
+import xlwt
+
+#크롤링할 키워드는 무엇입니까?
+keyword  = input('크롤링할 키워드는 무엇입니까?:')
+include_keywords =  list(input('''포함할 키워드를 입력하세요:(예:운동,요리)''').split(','))
+exclude_keywords =  list(input('''제외할 키워드를 입력하세요:(예:운동,요리)''').split(','))
+cnt = int(input('4. 크롤링할 건수는 몇 건입니까?:'))
+start =  input('5. 조회를 시작할 년도를 입력하세요(예:20230101):')
+end = input('6. 조회를 종료할 날짜를 입력하세요(예:20231231):')
+f_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.txt"
+fc_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.csv"
+fx_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.xlsx"
+
+#Step 3. 크롬 드라이버를 사용해서 웹 브라우저를 실행합니다.
+s_time = time.time( )
+path = "c:/temp/chromedriver_240/chromedriver.exe"
+driver = webdriver.Chrome(path)
+
+driver.get('https://www.naver.com/')
+time.sleep(2)
+
+search_bar = driver.find_element(By.ID,"query")
+search_bar.send_keys(keyword)
+
+driver.find_element(By.ID,'search-btn').click()
+time.sleep(1)
+
+driver.find_element(By.LINK_TEXT,'VIEW').click()
+time.sleep(1)
+
+driver.find_element(By.LINK_TEXT,'블로그').click()
+time.sleep(1)
+
+driver.get('https://search.naver.com/search.naver?sm=tab_hty.top&where=blog&query=' + keyword + '+%2B' + '+%2B'.join(include_keywords) + '+-' + '+-'.join(exclude_keywords) + '&nso=&where=blog&sm=tab_opt&nso=so:r,p:from'+start+'to'+end)
+time.sleep(2)
+
+no = 1            # 게시글 번호 카운트용 변수
+
+num = 0
+no2 =[ ]
+nick_name2 =[ ]
+date2 =[ ]
+title2 =[ ]
+content2 =[ ]
+
+all_html = driver.page_source
+soup = BeautifulSoup(all_html, 'html.parser')
+content_list = soup.find('ul',class_='lst_total')
+
+for i in content_list.find_all("li", "bx"):
+    # 게시글 번호 입력
+    no2.append(no)
+    print('번호:',no)
+        
+    nick_name = i.find('a','sub_txt sub_name').get_text( )
+    nick_name2.append(nick_name)
+    print('닉네임:',nick_name.strip())
+    
+    date = i.find('span','sub_time sub_txt').get_text()
+    date2.append(date)
+    print('날짜:',date.strip())
+   
+    title = i.find('a','api_txt_lines total_tit').get_text()
+    title2.append(title)
+    print('제목:',title.strip())
+    
+    content = i.find('div','api_txt_lines dsc_txt').get_text()
+    content2.append(content)
+    print('내용:',content.strip())
+    no+=1
+    num+=1
+    if num == cnt:
+        break
+
+    time.sleep(2)        # 페이지 변경 전 2초 대기 
+
+import pandas as pd
+
+dongseo_blog = pd.DataFrame()
+dongseo_blog['번호']=no2
+dongseo_blog['닉네임']=nick_name2
+dongseo_blog['날짜']=date2
+dongseo_blog['제목']=title2
+dongseo_blog['내용']=content2
+
+# csv 형태로 저장하기
+dongseo_blog.to_csv(fc_name, encoding="utf-8-sig")
+
+# 엑셀 형태로 저장하기
+import xlwt   
+dongseo_blog.to_excel(fx_name)
+
+# 출력 결과를 txt 파일로 저장하기
+f = open(f_name, 'a',encoding='UTF-8')
+f.write(str(no2))
+f.write(str(nick_name2))
+f.write(str(date2))
+f.write(str(title2))
+f.write(str(content2))
+f.close()
+
+print("저장 완료 되었습니다.")

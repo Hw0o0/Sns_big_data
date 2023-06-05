@@ -1,0 +1,90 @@
+# 이미지 다운로드용 웹크롤러 만들기
+
+from bs4 import BeautifulSoup
+from selenium import webdriver
+import urllib.request
+import urllib
+import time
+import sys
+import re
+import math
+import os
+import random
+from selenium.webdriver.common.by import By
+
+keyword  = input('크롤링할 키워드는 무엇입니까?:')
+cnt = int(input('크롤링할 건수는 몇 건입니까?:'))
+f_dir = "C:\\Users\\UIT801-\\Desktop\\웹크롤링\\"
+query_txt ='사진저장'
+
+# 파일을 저장할 폴더를 생성한다.
+now = time.localtime()
+s = '%04d-%02d-%02d-%02d-%02d-%02d' % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
+
+os.chdir(f_dir)
+os.makedirs(f_dir+s+'-'+query_txt)
+os.chdir(f_dir+s+'-'+query_txt)
+f_result_dir = f_dir+s+'-'+query_txt
+
+# 크롬 드라이버를 사용해서 웹 브라우저를 실행한다.
+path = "c:/temp/chromedriver_240/chromedriver.exe"
+driver = webdriver.Chrome(path)
+
+# 크롤링 시작 시간을 위한 타임 스탬프를 찍는다
+s_time = time.time( )     
+
+driver.get("https://www.google.co.kr/imghp?hl=ko&ogbl")
+
+search_bar = driver.find_element(By.ID,"APjFqb")
+search_bar.send_keys(keyword)
+# 검색버튼 눌러줌
+search_bar.submit()
+time.sleep(1)
+
+# 자동 스크롤 함수
+def scroll_down(driver):
+    driver.execute_script("window.scrollTo(0,document.body.scrollHeight);")
+    time.sleep(1)
+    
+scroll_down(driver) 
+
+# 이미지 추출하여 저장하기 
+file_no = 1                               
+count = 1
+img_src2=[]
+
+html = driver.page_source
+soup = BeautifulSoup(html, 'html.parser')
+
+img_src = soup.findAll('img',class_='rg_i Q4LuWd')
+
+for i in img_src :
+        img_src1=i.get("src")
+        img_src2.append(img_src1)
+        count += 1
+        
+
+for i in range(0,len(img_src2)) :
+        try :
+                urllib.request.urlretrieve(img_src2[i],f_result_dir+'\\'+str(file_no)+'.jpg')
+                print("%s 번째 이미지 저장중입니다=======" %file_no)
+                file_no += 1
+        except :
+                continue        
+        if file_no == cnt+1:
+            break
+        time.sleep(0.5)      
+        
+        
+#요약 정보 출력              
+e_time = time.time( )
+t_time = e_time - s_time
+store_cnt = file_no -1
+
+print("=" *70)
+print("총 소요시간은 %s 초 입니다 " %round(t_time,1))
+print("총 저장 건수는 %s 건 입니다 " %file_no)
+print("파일 저장 경로: %s 입니다" %f_result_dir)
+print("=" *70)
+
+driver.close( )

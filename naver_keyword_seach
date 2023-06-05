@@ -15,9 +15,9 @@ import xlwt
 keyword  = input('크롤링할 키워드는 무엇입니까?:')
 include_keywords =  list(input('''포함할 키워드를 입력하세요:(예:운동,요리)''').split(','))
 exclude_keywords =  list(input('''제외할 키워드를 입력하세요:(예:운동,요리)''').split(','))
-cnt = int(input('4. 크롤링할 건수는 몇 건입니까?:'))
-start =  input('5. 조회를 시작할 년도를 입력하세요(예:20230101):')
-end = input('6. 조회를 종료할 날짜를 입력하세요(예:20231231):')
+cnt = int(input('크롤링할 건수는 몇 건입니까?:'))
+start =  input('조회를 시작할 년도를 입력하세요(예:20230101):')
+end = input('조회를 종료할 날짜를 입력하세요(예:20231231):')
 f_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.txt"
 fc_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.csv"
 fx_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.xlsx"

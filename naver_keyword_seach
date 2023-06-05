@@ -87,19 +87,19 @@ for i in content_list.find_all("li", "bx"):
 
 import pandas as pd
 
-dongseo_blog = pd.DataFrame()
-dongseo_blog['번호']=no2
-dongseo_blog['닉네임']=nick_name2
-dongseo_blog['날짜']=date2
-dongseo_blog['제목']=title2
-dongseo_blog['내용']=content2
+keyword_blog = pd.DataFrame()
+keyword_blog['번호']=no2
+keyword_blog['닉네임']=nick_name2
+keyword_blog['날짜']=date2
+keyword_blog['제목']=title2
+keyword_blog['내용']=content2
 
 # csv 형태로 저장하기
-dongseo_blog.to_csv(fc_name, encoding="utf-8-sig")
+keyword_blog.to_csv(fc_name, encoding="utf-8-sig")
 
 # 엑셀 형태로 저장하기
 import xlwt   
-dongseo_blog.to_excel(fx_name)
+keyword_blog.to_excel(fx_name)
 
 # 출력 결과를 txt 파일로 저장하기
 f = open(f_name, 'a',encoding='UTF-8')

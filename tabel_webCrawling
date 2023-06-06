@@ -1,0 +1,172 @@
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
+import time
+import sys
+import os
+import math
+import numpy  
+import pandas as pd  
+import xlwt
+
+#크롤링할 키워드는 무엇입니까?
+keyword  = input('크롤링할 키워드는 무엇입니까?:')
+#keyword = "나라"
+start =  input('조회를 시작할 년도를 입력하세요(예:2023/01/01):')
+#start = "2023/01/01"
+end = input('조회를 종료할 날짜를 입력하세요(예:2023/12/31):')
+#end = "2023/06/05"
+f_dir = "C:\\Users\\UIT801-\\Desktop\\웹크롤링\\"
+
+f_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.txt"
+fc_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.csv"
+fx_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.xlsx"
+
+
+# 크롬 드라이버를 사용해서 웹 브라우저를 실행한다.
+path = "c:/temp/chromedriver_240/chromedriver.exe"
+driver = webdriver.Chrome(path)
+
+driver.get('https://www.g2b.go.kr/index.jsp')
+time.sleep(2)
+
+search_bar = driver.find_element(By.ID,"bidNm")
+search_bar.send_keys(keyword)
+
+from_date= driver.find_element(By.ID,"fromBidDt")
+from_date.clear()
+from_date.send_keys(start)
+
+to_date = driver.find_element(By.ID,"toBidDt")
+to_date.clear()
+to_date.send_keys(end)
+
+driver.find_element(By.CLASS_NAME,'btn_dark').click()
+time.sleep(1)
+
+
+no = 1
+no2 = []
+call_11 = []
+call_22 = []
+call_33 = []
+call_44 = []
+call_55 = []
+call_66 = []
+call_77 = []
+call_88 = []
+call_99 = []
+call_100 = []
+call_111 = []
+
+#NoSuchElementException 문제 해결
+driver.switch_to.frame('sub')
+driver.switch_to.frame('main')
+
+# (table_list_tbidTbl table_list) 테이블 두개.
+table = driver.find_element(By.CLASS_NAME, 'table_list_tbidTbl')
+tbody = table.find_element(By.TAG_NAME, 'tbody')
+rows = tbody.find_elements(By.TAG_NAME,'tr')
+
+for index, row in enumerate(rows):
+    body = row.find_elements(By.TAG_NAME, 'td')
+    
+    no2.append(no)
+    print('번호:', no)
+    
+    call_1 = body[0].text
+    call_11.append(call_1)
+    print('용역:', call_1)
+
+    call_2 = body[1].text
+    call_22.append(call_2)
+    print('공고번호_차수:', call_2)
+   
+    call_3 = body[2].text
+    call_33.append(call_3)
+    print('분류:',call_3)
+    
+    call_4 = body[3].text
+    call_44.append(call_4)
+    print('공고명:',call_4)
+    
+    div = body[3].find_element(By.TAG_NAME,'div')
+    call_5 = div.find_element(By.TAG_NAME, 'a').get_attribute("href")
+    #attribute- 링크 추출
+
+    call_55.append(call_5)
+    print('URL 주소:',call_5)
+    
+    call_6 = body[4].text
+    call_66.append(call_6)
+    print('공고기관:',call_6)
+   
+    call_7 = body[5].text
+    call_77.append(call_7)
+    print('수요기관:',call_7)
+    
+    call_8 = body[6].text
+    call_88.append(call_8)
+    print('계약방법:',call_8)
+    
+    call_9 = body[7].text
+    call_99.append(call_9)
+    print('입력일시:',call_9)
+    
+    call_10 =body[8].text
+    call_100.append(call_10)
+    print('공동수급:',call_10)
+   
+    call_101 = body[9].text
+    call_111.append(call_101)
+    print('통찰여부:', call_101)
+    print('\n')
+
+    no += 1
+        
+    time.sleep(2)
+
+# DataFrame 생성 및 데이터 저장
+import pandas as pd
+
+countryMarket = pd.DataFrame()
+countryMarket['용역']=call_11
+countryMarket['공고번호_차수']=call_22
+countryMarket['분류']=call_33
+countryMarket['공고명']=call_44
+countryMarket['URL 주소']=call_55
+countryMarket['공고기관']=call_66
+countryMarket['수요기관']=call_77
+countryMarket['계약방법']=call_88
+countryMarket['입력일시']=call_99
+countryMarket['공동수급']=call_100
+countryMarket['통찰여부']=call_111
+
+# csv 형태로 저장하기
+countryMarket.to_csv(fc_name, encoding="utf-8-sig")
+
+# 엑셀 형태로 저장하기
+import xlwt   
+countryMarket.to_excel(fx_name)
+
+# 출력 결과를 txt 파일로 저장하기
+f = open(f_name, 'a',encoding='UTF-8')
+
+for i in range(len(no2)):
+        f.write(str(no2[i]) +'번째 공고내용 추출합니다. ~~~~\n')
+        f.write('1. 업무:'+ call_11[i]+'\n')
+        f.write('2. 공고번호-차수:'+call_22[i] +'\n')
+        f.write('3. 분류:'+ call_33[i] +'\n')
+        f.write('4. 공고명:'+ call_44[i] +'\n')
+        f.write('5. URL 주소:'+ call_55[i] +'\n')
+        f.write('6. 공고기관:'+ call_66[i] +'\n')
+        f.write('7. 수요기관:'+ call_77[i] +'\n')
+        f.write('8. 계약방법:'+ call_88[i] +'\n')
+        f.write('9. 입력일시(입찰마감일시):' + call_99[i] +'\n')
+        f.write('10. 공동수급:'+ call_100[i] +'\n')
+        f.write('11. 투찰여부:'+ call_111[i] +'\n')
+        f.write('\n')
+        
+f.close()
+print("저장 완료 되었습니다.")

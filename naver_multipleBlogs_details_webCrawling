@@ -1,0 +1,144 @@
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import time
+import sys
+
+import math
+import numpy  
+import pandas as pd  
+import xlwt
+
+#크롤링할 키워드는 무엇입니까?
+keyword  = input('1. 크롤링할 키워드는 무엇입니까?:')
+#keyword = "헬스"
+include_keywords =  list(input('''2. 결과에서 반드시 포함하는 단어를 입력하세요:(예:국내,바닷가)''').split(','))
+#include_keywords = ['가슴', '삼두']
+exclude_keywords =  list(input('''3. 결과에서 제외할 단어를 입력하세요:(예:분양권,해외)''').split(','))
+#exclude_keywords = ['등', '이두']
+cnt = int(input('4. 크롤링할 건수는 몇 건입니까?:'))
+#cnt = int(10)
+start =  input('5. 조회를 시작할 년도를 입력하세요(예:20230101):')
+#start = "20230101"
+end = input('6. 조회를 종료할 날짜를 입력하세요(예:20231231):')
+#end = "20230605"
+#파일을 저장할 폴더명만 쓰세요.
+f_dir = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\"
+
+f_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.txt"
+fc_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.csv"
+fx_name = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\getWebIf.xlsx"
+
+
+#Step 3. 크롬 드라이버를 사용해서 웹 브라우저를 실행합니다.
+s_time = time.time( )
+path = "c:/temp/chromedriver_240/chromedriver.exe"
+driver = webdriver.Chrome(path)
+
+driver.get('https://www.naver.com/')
+time.sleep(2)
+
+search_bar = driver.find_element(By.ID,"query")
+search_bar.send_keys(keyword)
+
+driver.find_element(By.ID,'search-btn').click()
+time.sleep(1)
+
+driver.find_element(By.LINK_TEXT,'VIEW').click()
+time.sleep(1)
+
+driver.find_element(By.LINK_TEXT,'블로그').click()
+time.sleep(1)
+
+driver.get('https://search.naver.com/search.naver?sm=tab_hty.top&where=blog&query=' + keyword + '+%2B' + '+%2B'.join(include_keywords) + '+-' + '+-'.join(exclude_keywords) + '&nso=&where=blog&sm=tab_opt&nso=so:r,p:from'+start+'to'+end)
+time.sleep(2)
+
+
+no = 1            
+num = 0
+cnt2 =[ ]
+no2 =[ ]
+url2 =[ ]
+nick_name2 =[ ]
+date2 =[ ]
+content2 =[ ]
+url_link =[ ]
+
+all_html = driver.page_source
+soup = BeautifulSoup(all_html, 'html.parser')
+content_list = soup.find('ul',class_='lst_total')
+
+for i in content_list.find_all("li", "bx"):
+    # 게시글 번호 입력
+    cnt2.append(cnt)
+    no2.append(no)
+    print('총 %s건 중 %s 번째 블로그 데이터를 수집합니다============' % (cnt, no))
+        
+    url = i.find('a','api_txt_lines total_tit').get("href")
+    url2.append(url)
+    print('블로그 주소:',url)
+    
+    nick_name = i.find('a','sub_txt sub_name').get_text( )
+    nick_name2.append(nick_name)
+    print('작성자 닉네임:',nick_name)
+    
+    date = i.find('span','sub_time sub_txt').get_text()
+    date2.append(date)
+    print('작성 일자:',date)
+    
+    driver.get(url)
+    
+    #driver.switch_to.frame('mainFrame')
+    driver.switch_to.frame('mainFrame')
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+    # 조건 리스트
+    conditions = [
+        ('span', 'se-fs-'),
+        ('span', 'se-fs-fs16'),
+        ('span', 'se-fs-fs11')
+        ]
+    # 조건에 따른 내용 추출
+    for tag, class_name in conditions:
+        content_list = soup.find_all(tag, class_name)
+        if content_list is not None:
+            for element in content_list:
+                text = element.get_text().replace("\n", "")
+                content += text
+                content2.append(text)    
+    num+=1
+    no+=1    
+    print(content)
+    print("\n")
+    driver.back( )  # 뒤로 돌아가기 기능
+    time.sleep(2)        # 페이지 변경 전 2초 대기 
+    
+    if num == cnt:
+        break
+        
+import pandas as pd
+
+keyword_blog = pd.DataFrame()
+keyword_blog['블로그 주소']=url2
+keyword_blog['작성자 닉네임']=nick_name2
+keyword_blog['작성 일자']=date2
+keyword_blog['블로그 내용']=content2
+
+# csv 형태로 저장하기
+keyword_blog.to_csv(fc_name, encoding="utf-8-sig")
+
+# 엑셀 형태로 저장하기
+import xlwt   
+keyword_blog.to_excel(fx_name)
+
+# 출력 결과를 txt 파일로 저장하기
+f = open(f_name, 'a',encoding='UTF-8')
+f.write(str(cnt2))
+f.write(str(no2))
+f.write(str(url2))
+f.write(str(nick_name2))
+f.write(str(date2))
+f.write(str(content2))
+f.close()
+
+print("저장 완료 되었습니다.")

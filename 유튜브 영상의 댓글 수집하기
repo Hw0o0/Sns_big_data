@@ -7,12 +7,12 @@ import time
 import sys
 
 #keyword  = input('유튜브에서 검색할 주제 키워드를 입력하세요(예:카리나):')
-keyword = "올리브영"
+keyword = "헬스"
 
 #cnt = int(input('위 주제로 댓글을 크롤링할 유튜브 영상은 몇건입니까?:'))
-cnt = 2
+cnt = 5
 #scroll_cnt = int('각 동영상에서 추출할 댓글은 몇건입니까?')
-chat_cnt = 2
+chat_cnt = 5
 #파일을 저장할 폴더명만 쓰세요.
 f_dir = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\"
 
@@ -23,6 +23,10 @@ fx_name = r"C:\Users\UIT801-\Desktop\웹크롤링\getWebIf.xlsx"
 path = "C:/Users/UIT801-/Desktop/chromedriver.exe"
 driver = webdriver.Chrome(path)
 
+def scroll_down(driver):
+    driver.execute_script("window.scrollTo(0,3000);")
+    time.sleep(1)
+    
 driver.get("https://www.youtube.com")
 time.sleep(1)
 
@@ -108,14 +112,15 @@ for i in range(int(cnt)):
             break
         x+=1   
     driver.back()  # 뒤로 돌아가기 기능
-    
-    # nick_name2 리스트의 길이를 youtube_chat DataFrame의 인덱스 길이와 일치하도록 조정
-    nick_name2 = nick_name2[:len(youtube_chat.index)]
-    date2 = date2[:len(youtube_chat.index)]
-    content2 = content2[:len(youtube_chat.index)]
 import pandas as pd
 
 youtube_chat = pd.DataFrame()
+
+#youtube_chat DataFrame의 인덱스 길이와 일치하도록 조정
+nick_name2 = nick_name2[:len(youtube_chat.index)]
+date2 = date2[:len(youtube_chat.index)]
+content2 = content2[:len(youtube_chat.index)]
+
 youtube_chat['URL 주소']=url2
 youtube_chat['작성자명']=nick_name2
 youtube_chat['작성일자']=date2

@@ -123,7 +123,7 @@ keyword_blog = pd.DataFrame()
 keyword_blog['블로그 주소']=url2
 keyword_blog['작성자 닉네임']=nick_name2
 keyword_blog['작성 일자']=date2
-keyword_blog['블로그 내용']=content2
+keyword_blog['블로그 내용'] = content2[:len(keyword_blog)]   
 
 # csv 형태로 저장하기
 keyword_blog.to_csv(fc_name, encoding="utf-8-sig")

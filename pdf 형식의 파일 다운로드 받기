@@ -1,0 +1,86 @@
+from bs4 import BeautifulSoup
+from selenium import webdriver
+import urllib.request
+import urllib
+import time
+import sys
+import re
+import math
+import os
+import random
+from selenium.webdriver.common.by import By
+
+keyword = input('크롤링할 키워드는 무엇입니까?:')
+cnt = int(input('크롤링할 건수는 몇 건입니까?:'))
+f_dir = "C:\\Users\\UIT801-\\Desktop\\웹크롤링\\"
+
+
+# 크롬 드라이버를 사용해서 웹 브라우저를 실행합니다.
+path = "c:/temp/chromedriver_240/chromedriver.exe"
+driver = webdriver.Chrome(path)
+
+s_time = time.time()  # 크롤링 시작 시간을 위한 타임 스탬프를 찍습니다
+
+driver.get("https://www.google.co.kr")
+
+search_bar = driver.find_element(By.NAME, "q")
+search_bar.send_keys(keyword + " filetype pdf")
+# 검색버튼 눌러줌
+search_bar.submit()
+time.sleep(1)
+
+# 본문의 링크 정보를 가져와서 지정된 폴더에 저장하기
+# 이미지 추출하여 저장하기
+file_no = 0
+pdf_links = []
+
+while True:
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    links = soup.find('div',class_='v7W49e')
+
+# PDF 파일 다운로드
+    for link in links.find_all('div','MjjYud'):
+        a = link.find('a')
+        url = a.get('href')
+        try:
+            file_name =  link.find('h3', class_='LC20lb').text
+        except:
+            print("다시 검색 하겠습니다.")
+            cnt-=1
+            break;
+        try:
+            file_no += 1
+            urllib.request.urlretrieve(url, f_dir + '\\' + file_name + '.pdf')
+            print("%s 번째 파일 다운로드 중입니다..." % file_no)
+            if file_no == cnt:
+                break
+        except:
+            file_no-=1
+            continue
+    if file_no == cnt:
+        break
+    try:
+        next_page_btn = driver.find_element(By.ID, 'pnnext')
+        next_page_btn.click()
+        time.sleep(2)
+    except NoSuchElementException:
+        print("pdf가 더이상 존재하지 않습니다.")
+        # 요약 정보 출력
+        e_time = time.time()
+        t_time = e_time - s_time
+        no-=1
+        print("=" * 70)
+        print("총 소요시간은 %s 초 입니다." % round(t_time, 1))
+        print("총 다운로드 건수는 %s 건 입니다." % file_no)
+        print("파일 저장 경로: %s 입니다." % f_dir)
+        print("=" * 70)
+        driver.close()
+e_time = time.time()
+t_time = e_time - s_time
+
+print("=" * 70)
+print("총 소요시간은 %s 초 입니다." % round(t_time, 1))
+print("총 다운로드 건수는 %s 건 입니다." % file_no)
+print("파일 저장 경로: %s 입니다." % f_dir)
+print("=" * 70)
+driver.close()        

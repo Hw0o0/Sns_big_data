@@ -133,13 +133,13 @@ import xlwt
 keyword_blog.to_excel(fx_name)
 
 # 출력 결과를 txt 파일로 저장하기
-f = open(f_name, 'a',encoding='UTF-8')
-f.write(str(cnt2))
-f.write(str(no2))
-f.write(str(url2))
-f.write(str(nick_name2))
-f.write(str(date2))
-f.write(str(content2))
-f.close()
-
+with open(f_name, 'w', encoding='utf-8') as file:
+    for i in range(len(no2)):
+        file.write('총 '+ str(cnt2[i]) + '건 중 ' + str(no2[i]) + '번째 블로그 데이터를 수집합니다. ============='+'\n')
+        file.write('1. 블로그 주소: ' + url2[i] + '\n')
+        file.write('2. 작성자: ' + nick_name2[i] + '\n')
+        file.write('3. 작성일자: ' + date2[i] + '\n')
+        file.write('4. 블로그 내용: ' + content2[i] + '\n')
+        file.write('\n')
+    f.close()
 print("저장 완료 되었습니다.")

@@ -52,6 +52,8 @@ url2 =[ ]
 nick_name2 =[ ]
 date2 =[ ]
 content2 =[ ]
+nick_name2 = ["작성자1", "작성자2"]
+nick_name2 = ["작성자1", "작성자2", "작성자3", "작성자4", "작성자5"]
 
 soup = BeautifulSoup(driver.page_source, "html.parser")
 

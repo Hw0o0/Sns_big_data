@@ -23,10 +23,6 @@ fx_name = r"C:\Users\UIT801-\Desktop\웹크롤링\getWebIf.xlsx"
 path = "C:/Users/UIT801-/Desktop/chromedriver.exe"
 driver = webdriver.Chrome(path)
 
-def scroll_down(driver):
-    driver.execute_script("window.scrollTo(0,3000);")
-    time.sleep(1)
-    
 driver.get("https://www.youtube.com")
 time.sleep(1)
 

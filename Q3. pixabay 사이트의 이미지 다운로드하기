@@ -48,8 +48,8 @@ while True:
             if response.content:
                 with open(os.path.join(folder_path, f'{count}.jpg'), 'wb') as f:
                     f.write(response.content)
-                print("이미지 길이: "+ str(len(images)))
-                print("카운트: " + str(count))
+#                 print("이미지 길이: "+ str(len(images)))
+#                 print("카운트: " + str(count))
                 count += 1
                 if count > cnt:
                     break

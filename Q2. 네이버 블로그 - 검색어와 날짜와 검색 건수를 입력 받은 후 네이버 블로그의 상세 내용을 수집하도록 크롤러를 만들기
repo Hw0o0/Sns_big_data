@@ -56,7 +56,6 @@ time.sleep(2)
 
 no = 1            
 num = 0
-content = "" 
 cnt2 =[ ]
 no2 =[ ]
 url2 =[ ]
@@ -99,6 +98,7 @@ for i in content_list.find_all("li", "bx"):
         ('span', 'se-fs-fs16'),
         ('span', 'se-fs-fs11')
         ]
+    content = "" 
     # 조건에 따른 내용 추출
     for tag, class_name in conditions:
         content_list = soup.find_all(tag, class_name)
@@ -106,7 +106,7 @@ for i in content_list.find_all("li", "bx"):
             for element in content_list:
                 text = element.get_text().replace("\n", "")
                 content += text
-                content2.append(text)    
+    content2.append(content)    
     num+=1
     no+=1    
     print(content)
@@ -116,7 +116,6 @@ for i in content_list.find_all("li", "bx"):
     
     if num == cnt:
         break
-        
 import pandas as pd
 
 keyword_blog = pd.DataFrame()
@@ -125,14 +124,16 @@ keyword_blog['작성자 닉네임']=nick_name2
 keyword_blog['작성 일자']=date2
 keyword_blog['블로그 내용'] = content2[:len(keyword_blog)]   
 
+
+
+
+# 엑셀 형태로 저장하기
+import xlwt  
+keyword_blog.to_excel(fx_name)
 # csv 형태로 저장하기
 keyword_blog.to_csv(fc_name, encoding="utf-8-sig")
 
-# 엑셀 형태로 저장하기
-import xlwt   
-keyword_blog.to_excel(fx_name)
-
-# 출력 결과를 txt 파일로 저장하기
+# txt 형태로 저장하기
 with open(f_name, 'w', encoding='utf-8') as file:
     for i in range(len(no2)):
         file.write('총 '+ str(cnt2[i]) + '건 중 ' + str(no2[i]) + '번째 블로그 데이터를 수집합니다. ============='+'\n')
@@ -141,5 +142,6 @@ with open(f_name, 'w', encoding='utf-8') as file:
         file.write('3. 작성일자: ' + date2[i] + '\n')
         file.write('4. 블로그 내용: ' + content2[i] + '\n')
         file.write('\n')
-    f.close()
+    file.close()
+
 print("저장 완료 되었습니다.")

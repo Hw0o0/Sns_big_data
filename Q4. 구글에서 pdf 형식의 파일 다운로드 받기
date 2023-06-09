@@ -12,8 +12,7 @@ from selenium.webdriver.common.by import By
 
 keyword = input('크롤링할 키워드는 무엇입니까?:')
 cnt = int(input('크롤링할 건수는 몇 건입니까?:'))
-f_dir = "C:\\Users\\UIT801-\\Desktop\\웹크롤링\\"
-
+f_dir = "C:\\Users\\UIT801-\\Desktop\\pdf\\"
 
 # 크롬 드라이버를 사용해서 웹 브라우저를 실행합니다.
 path = "c:/temp/chromedriver_240/chromedriver.exe"

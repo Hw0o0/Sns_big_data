@@ -7,12 +7,12 @@ import time
 import sys
 
 #keyword  = input('유튜브에서 검색할 주제 키워드를 입력하세요(예:카리나):')
-keyword = "헬스"
+keyword = "카리나"
 
 #cnt = int(input('위 주제로 댓글을 크롤링할 유튜브 영상은 몇건입니까?:'))
-cnt = 5
+cnt = 2
 #scroll_cnt = int('각 동영상에서 추출할 댓글은 몇건입니까?')
-chat_cnt = 5
+chat_cnt = 3
 #파일을 저장할 폴더명만 쓰세요.
 f_dir = "C:\\Users\\UIT801-\Desktop\\웹크롤링\\"
 
@@ -49,11 +49,12 @@ x = 1
 x2 = [ ]
 no2 =[ ]
 url2 =[ ]
+url3 = [ ]
 nick_name2 =[ ]
 date2 =[ ]
 content2 =[ ]
-nick_name2 = ["작성자1", "작성자2"]
-nick_name2 = ["작성자1", "작성자2", "작성자3", "작성자4", "작성자5"]
+# nick_name2 = ["작성자1", "작성자2"]
+# nick_name2 = ["작성자1", "작성자2", "작성자3", "작성자4", "작성자5"]
 
 soup = BeautifulSoup(driver.page_source, "html.parser")
 
@@ -72,7 +73,7 @@ for i in range(int(cnt)):
     driver.get("https://www.youtube.com" + url2[num1])
     time.sleep(1)
     #영상 갯수 체크
-    num1 += 1
+    
     
     #자동 스크롤 
     while 1:
@@ -88,6 +89,9 @@ for i in range(int(cnt)):
         y = 6
         for i in content_list:
             # strip() = 공백 제거
+            
+            url3.append(url2[num1])
+            
             x+=1
             no2.append(no)  
             x2.append(x)
@@ -108,22 +112,25 @@ for i in range(int(cnt)):
             if x == chat_cnt:
                 break
         no += 1
+        
         if no == cnt:
             break
         if (30*x) > chat_cnt:
             break
         x+=1   
+    num1 += 1
     driver.back()  # 뒤로 돌아가기 기능
 import pandas as pd
 
 youtube_chat = pd.DataFrame()
 
 #youtube_chat DataFrame의 인덱스 길이와 일치하도록 조정
-nick_name2 = nick_name2[:len(youtube_chat.index)]
-date2 = date2[:len(youtube_chat.index)]
-content2 = content2[:len(youtube_chat.index)]
+# all_cnt = cnt * chat_cnt
+# nick_name2 = nick_name2[:all_cnt]
+# date2 = date2[:all_cnt]
+# content2 = content2[:all_cnt]
 
-youtube_chat['URL 주소']=url2
+youtube_chat['URL 주소']=url3
 youtube_chat['작성자명']=nick_name2
 youtube_chat['작성일자']=date2
 youtube_chat['내용']=content2
@@ -138,11 +145,11 @@ youtube_chat.to_excel(fx_name)
 print(" xls 파일 저장 경로: %s" %fx_name)
 
 # 출력 결과를 txt 파일로 저장하기
-with open(fc_name, 'a', encoding='UTF-8') as f:
+with open(f_name, 'a', encoding='UTF-8') as f:
     for i in range(len(no2)):
-        f.write(str(x2[i]) + '번째 영상의 ' + str(no2[i]) + ' 추출합니다. ~~~')
+        f.write(str(no2[i]) + '번째 영상의 ' + str(x2[i]) + ' 추출합니다. ~~~')
         if i < len(url2):
-            f.write('1. URL 주소:' + url2[i] + '\n')
+            f.write('1. URL 주소:' + url3[i] + '\n')
         if i < len(nick_name2):
             f.write('2. 댓글 작성자명:' + nick_name2[i] + '\n')
         if i < len(date2):
